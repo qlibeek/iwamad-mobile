@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { Link } from 'expo-router'
 
 export default function App() {
   const [likes, setLikes] = useState(0)
@@ -17,6 +18,13 @@ export default function App() {
       >
         <Text style={styles.buttonText}>Like</Text>
       </Pressable>
+      
+      <Link href="/events" asChild>
+        <Pressable style={styles.eventsButton}>
+          <Text style={styles.eventsButtonText}>Events</Text>
+        </Pressable>
+      </Link>
+
     </View>
   )
 }
@@ -42,6 +50,16 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   buttonText: {
+    fontSize: 20,
+  },
+  eventsButton: {
+    minHeight: 44,
+    paddingHorizontal: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  eventsButtonText: {
     fontSize: 20,
   },
 })
