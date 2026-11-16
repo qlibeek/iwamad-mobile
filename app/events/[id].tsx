@@ -1,19 +1,48 @@
-import { Stack, Link, router, useLocalSearchParams } from 'expo-router'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native'
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 
-import { events } from '../../src/data/events'
+import { useEvents } from '../../src/hooks/useEvents'
 
 export default function EventDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
-  const event = events.find((item) => item.id === Number(id))
+  const router = useRouter()
+
+  const { data, isPending, isError, error, refetch } = useEvents()
+
+  if (isPending) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator />
+        <Text>Loading events</Text>
+      </View>
+    )
+  }
+
+  if (isError) {
+    return (
+      <View style={styles.center}>
+        <Text>Could not load events</Text>
+        <Text>{error.message}</Text>
+
+        <Pressable onPress={() => refetch()} style={styles.button}>
+          <Text>Try again</Text>
+        </Pressable>
+      </View>
+    )
+  }
+
+  const eventId = Number(id)
+  const event = data.find((item) => item.id === eventId)
 
   if (!event) {
     return (
-      <View style={styles.container}>
-        <Stack.Screen options={{ title: 'Event' }} />
-        <Text style={styles.title}>Event not found</Text>
+      <View style={styles.center}>
+        <Text>Event not found</Text>
         <Text>No event with id {id}.</Text>
-        <Link href="/events">Back to events</Link>
+
+        <Pressable onPress={() => router.push('/events')} style={styles.button}>
+          <Text>Back to events</Text>
+        </Pressable>
       </View>
     )
   }
@@ -23,16 +52,9 @@ export default function EventDetailsScreen() {
       <Stack.Screen options={{ title: event.title }} />
 
       <Text style={styles.title}>{event.title}</Text>
-      <Text style={styles.info}>{event.date}</Text>
-      <Text style={styles.info}>{event.place}</Text>
-      <Text style={styles.info}>{event.seats} seats</Text>
-
-      <Pressable
-        onPress={() => router.back()}
-        style={styles.backButton}
-      >
-        <Text>Back to events</Text>
-      </Pressable>
+      <Text>{event.date}</Text>
+      <Text>{event.place}</Text>
+      <Text>{event.seats} seats</Text>
     </View>
   )
 }
@@ -43,18 +65,22 @@ const styles = StyleSheet.create({
     padding: 24,
     paddingTop: 120,
   },
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+  },
   title: {
     fontSize: 24,
     fontWeight: '600',
-    marginBottom: 16,
+    marginBottom: 12,
   },
-  info: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  backButton: {
+  button: {
     minHeight: 44,
+    paddingHorizontal: 20,
     justifyContent: 'center',
-    marginTop: 20,
+    borderWidth: 1,
+    borderColor: '#999',
   },
 })

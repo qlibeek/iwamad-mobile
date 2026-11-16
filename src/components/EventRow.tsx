@@ -37,7 +37,7 @@ export default function EventRow({
 const styles = StyleSheet.create({
   card: {
     minHeight: 44,
-    padding: 16,
+    padding: 30,
     borderWidth: 1,
     borderColor: '#cccccc',
     marginBottom: 12,
