@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import { useRouter } from 'expo-router'
+import { useSavedIds } from '../../src/hooks/useSavedIds'
 
 import EventRow from '../../src/components/EventRow'
 import { useEvents } from '../../src/hooks/useEvents'
@@ -8,8 +9,8 @@ import { useEvents } from '../../src/hooks/useEvents'
 export default function EventsScreen() {
   const router = useRouter()
   const { data, isPending, isError, error, refetch, isRefetching } = useEvents()
+  const { savedIds, toggleSaved } = useSavedIds()
 
-  const [savedIds, setSavedIds] = useState<number[]>([])
   const [search, setSearch] = useState('')
 
   if (isPending) {
@@ -41,13 +42,7 @@ export default function EventsScreen() {
     event.title.toLowerCase().includes(search.toLowerCase())
   )
 
-  function toggleSaved(id: number) {
-    setSavedIds((ids) =>
-      ids.includes(id)
-        ? ids.filter((savedId) => savedId !== id)
-        : [...ids, id]
-    )
-  }
+  
 
   return (
     <View style={styles.container}>
@@ -67,7 +62,7 @@ export default function EventsScreen() {
           <EventRow
             event={item}
             onPress={() => router.push(`/events/${item.id}`)}
-            onLongPress={() => toggleSaved(item.id)}
+            onToggleSaved={() => toggleSaved(item.id)}
             saved={savedIds.includes(item.id)}
           />
         )}
